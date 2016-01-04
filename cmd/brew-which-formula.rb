@@ -20,16 +20,34 @@ def matches(cmd)
   Utils.popen_read("grep", "--color=never", cmd, LIST_PATH).chomp.split(/\n/)
 end
 
+<<<<<<< HEAD
 # Test if we have to reject the given formula, i.e. not suggest it.
 def reject_formula?(name)
   f = Formula[name] rescue nil
   f.nil? || f.installed? || f.requirements.any? { |r| r.required? && !r.default_formula? && !r.satisfied? }
+=======
+def reject_formula?(name)
+  f = Formula[formula] rescue nil
+  f.nil? || f.installed? || f.requirements.any? { |r| r.required? && !r.satisfied? }
+end
+
+# Print a small text explaining how to get 'cmd' by installing 'formula'. Note
+# that it'll still suggest to install the formula if it's already installed but
+# unlinked.
+def explain_formula_install(cmd, formula)
+  return if reject_formula formula
+  puts <<-EOS
+The program '#{cmd}' is currently not installed. You can install it by typing:
+  brew install #{formula}
+  EOS
+>>>>>>> origin/reject
 end
 
 # Print a small text explaining how to get 'cmd' by installing one of the given
 # formulae.
 def explain_formulae_install(cmd, formulae)
   formulae.reject! { |f| reject_formula? f }
+<<<<<<< HEAD
   case formulae.size
   when 0 then return
   when 1
@@ -44,6 +62,15 @@ def explain_formulae_install(cmd, formulae)
       Try: brew install <selected formula>
     EOS
   end
+=======
+  return if formulae.empty?
+  return explain_formula_install(cmd, formulae.first) if formulae.size == 1
+  puts <<-EOS.undent
+    The program '#{cmd}' can be found in the following formulae:
+      * #{formulae * "\n      * "}
+    Try: brew install <selected formula>
+  EOS
+>>>>>>> origin/reject
 end
 
 # if 'explain' is false, print all formulae that can be installed to get the
